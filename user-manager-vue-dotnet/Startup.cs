@@ -11,6 +11,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using VueCliMiddleware;
 using Microsoft.EntityFrameworkCore;
+using user_manager_vue_dotnet.Entities;
+using Microsoft.AspNetCore.Authentication;
+using user_manager_vue_dotnet.Helpers;
+using user_manager_vue_dotnet.Services;
 
 namespace user_manager_vue_dotnet
 {
@@ -26,8 +30,21 @@ namespace user_manager_vue_dotnet
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<UserContext>(opt => opt.UseInMemoryDatabase("Users"));
+            services.AddDbContext<UserContext>(opt =>
+            {
+                opt.UseInMemoryDatabase("Users");
+                opt.EnableSensitiveDataLogging(true);
+            });
+            services.AddCors();
             services.AddControllers();
+
+            // configure basic authentication 
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
+
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp";
@@ -44,6 +61,14 @@ namespace user_manager_vue_dotnet
 
             app.UseRouting();
             app.UseSpaStaticFiles();
+
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

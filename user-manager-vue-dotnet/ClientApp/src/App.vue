@@ -1,16 +1,20 @@
 <template>
   <div class="wrapper">
-    <Header></Header>
-    <SidebarMenu></SidebarMenu>
+    <Login v-if="this.$route.path.includes(['/login'])" />
 
-    <div class="content-wrapper">
-      <router-view />
+    <div class="main-app" v-if="!this.$route.path.includes(['/login'])">
+      <Header />
+      <SidebarMenu />
+
+      <div class="content-wrapper">
+        <router-view />
+      </div>
+
+      <Footer />
+
+      <aside class="control-sidebar control-sidebar-dark"></aside>
+      <div id="sidebar-overlay" v-on:click="toggleMenuSidebar"></div>
     </div>
-
-    <Footer></Footer>
-
-    <aside class="control-sidebar control-sidebar-dark"></aside>
-    <div id="sidebar-overlay" v-on:click="toggleMenuSidebar"></div>
   </div>
 </template>
 
@@ -18,7 +22,8 @@
 import Header from "./components/layout/Header";
 import SidebarMenu from "./components/layout/SidebarMenu";
 import Footer from "./components/layout/Footer";
-import axios from "axios";
+import Login from "./components/login/Login";
+import UserService from "././_services/users-service";
 
 export default {
   name: "App",
@@ -26,11 +31,12 @@ export default {
     Header,
     SidebarMenu,
     Footer,
+    Login,
   },
   data() {
     return {
       user: null,
-      users: []
+      users: [],
     };
   },
   methods: {
@@ -42,62 +48,11 @@ export default {
         document.body.classList.remove("sidebar-collapse");
         document.body.classList.add("sidebar-open");
       }
-    },
-    getUsers() {
-      axios
-        .get("/api/users")
-        .then((response) => {
-          this.users = response.data;
-          console.log(this.users);
-          if (this.users.length == 0) this.seedUsers();
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-    },
-    createUser(user) {
-      axios
-        .post("/api/users", {
-          email: user.email,
-          password: user.password,
-          name: user.name,
-        })
-        .then((response) => {
-          this.user = response.data;
-          console.log(`User ${this.user.name} created!`);
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-    },
-    seedUsers() {
-      const seedData = [
-        {
-          email: "user1@user.com",
-          password: "user1pw",
-          name: "user 1",
-        },
-        {
-          email: "user2@user.com",
-          password: "user2pw",
-          name: "user 2",
-        },
-        {
-          email: "user3@user.com",
-          password: "user3pw",
-          name: "user 3",
-        },
-      ];
-
-      seedData.forEach(user => {
-        this.createUser(user)
-      });
-      console.log('user database seeded')
-    },
+    }
   },
   mounted() {
-    this.getUsers();
-  }
+    UserService.seedUsers();
+  },
 };
 </script>
 
