@@ -3,29 +3,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
-namespace user_manager_vue_dotnet
+namespace user_manager_vue_dotnet.Entities
 {
     public class UserContext : DbContext
     {
-        public UserContext(DbContextOptions<UserContext> options) : base(options)
-        {
-
-        }
-
+        public UserContext(DbContextOptions<UserContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder options)
-        //    => options.UseSqlite("Data Source=users.db");
     }
 
     public class User
     {
         public int UserId { get; set; }
         public string Email { get; set; }
+        [StringLength(maximumLength: 8, MinimumLength = 3, ErrorMessage = "The {0} value cannot exceed {1} characters. ")]
         public string Password { get; set; }
         public string Name { get; set; }
-
-        //public List<User> Users { get; } = new List<User>();
     }
 }
