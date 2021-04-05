@@ -33,11 +33,10 @@
       <div class="container-fluid">
         <div class="row">
           <!-- Profile Card (use v-for each user) -->
-          <div class="col-md-4 p-3" v-for="user of users" v-bind:key="user">
+          <div class="col-md-4 p-3" v-for="user of users" :key="user.userId">
             <!-- Profile Image -->
             <div class="card card-primary card-outline">
               <div class="card-body box-profile">
-                
                 <div class="text-center">
                   <img
                     class="profile-user-img img-fluid img-circle"
@@ -68,7 +67,6 @@
                     <b>Delete</b>
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
@@ -79,7 +77,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import UsersService from "../_services/users-service";
 export default {
   data() {
     return {
@@ -88,29 +86,18 @@ export default {
     };
   },
   methods: {
-    getUsers() {
-      axios
-        .get("/api/users")
-        .then((response) => {
-          this.users = response.data;
-          console.log(this.users);
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-    },
     deleteUser(id) {
-      axios
-        .delete(`/api/users/${id}`)
-        .then((response) => {
-          this.user = response.data;
-          console.log(this.user);
-          alert(`User ${this.user.name} deleted!`);
-          this.getUsers();
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      UsersService.delete(id).then((user) => {
+        this.user = user;
+        console.log(user);
+        this.getUsers();
+      });
+    },
+    getUsers() {
+      UsersService.getAll().then((users) => {
+        this.users = users;
+        console.log(users);
+      });
     },
   },
   beforeMount() {

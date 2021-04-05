@@ -109,28 +109,18 @@
 </template>
 
 <script>
-import axios from 'axios'
+import UsersService from '../_services/users-service';
 export default {
   data() {
     return {
       users: [],
     };
   },
-  methods: {
-    getUsers() {
-      axios
-        .get("/api/users")
-        .then((response) => {
-          this.users = response.data;
-          console.log(response)
-        })
-        .catch(function (error) {
-          alert(error);
-        });
-    },
-  },
   beforeMount() {
-    this.getUsers()
+    UsersService.getAll().then((users) => {
+      this.users = users;
+      console.log(users);
+    });
   }
 };
 </script>

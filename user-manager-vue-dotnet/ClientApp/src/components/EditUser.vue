@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import UsersService from "../_services/users-service";
 export default {
   data() {
     return {
@@ -97,38 +97,19 @@ export default {
   },
   methods: {
     getUser() {
-      axios
-        .get(`/api/users/${this.$route.params.userId}`)
-        .then((response) => {
-          this.user = response.data;
-          this.emailInput = this.user.email;
-          this.passwordInput = this.user.password;
-          this.nameInput = this.user.name;
-          console.log(this.user);
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      UsersService.getUser(this.$route.params.userId).then((response) => {
+        this.user = response;
+        this.emailInput = this.user.email;
+        this.passwordInput = this.user.password;
+        this.nameInput = this.user.name;
+      });
     },
     updateUser() {
-      axios
-        .put(`/api/users/${this.user.userId}`, {
-          userId: this.user.userId,
-          email: this.emailInput,
-          password: this.passwordInput,
-          name: this.nameInput,
-        })
-        .then(() => {
-          alert(`User ${this.user.name} updated!`);
-          this.$router.push('/users');
-        })
-        .catch(function (error) {
-          alert(error);
-        });
+      UsersService.update(this.user.userId, this);
     },
   },
   mounted() {
-    this.getUser()
-  }
+    this.getUser();
+  },
 };
 </script>

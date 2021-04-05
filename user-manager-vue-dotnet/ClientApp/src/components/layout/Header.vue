@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import UserService from "../../_services/users-service";
 export default {
   name: "Header",
   methods: {
@@ -33,13 +34,9 @@ export default {
         document.body.classList.add("sidebar-open");
       }
     },
-    async login () {
-      console.log("login requested");
-      await this.$auth.signInWithRedirect()
-    },
     async logout () {
-      console.log("logout requested");
-      await this.$auth.signOut()
+      UserService.logout();
+      window.location.reload();
     }
   }
 };
